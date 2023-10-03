@@ -1,0 +1,22 @@
+{
+  "name": "nft-collection-generator",
+  "version": "1.0.4",
+  "description": "generate multiple nft collections using trates",
+  "main": "./bin/index.js",
+  "bin": {
+    "tran": "./bin/index.js"
+  },
+  "scripts": {
+    "start": "node ./bin/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "url": "https://github.com/cyber-storm-200712/nfg-generator.git"
+  },
+  "author": "cyberstorm",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "command-line-args": "^5.2.1"
+  }
+}
