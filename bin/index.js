@@ -15,8 +15,8 @@ const optionDefinitions = [
 const argumentsOption = commandLineArgs(optionDefinitions)
 
 const imageFormat = {
-    width: 300,
-    height: 300,
+    width: 250,
+    height: 1000,
 };
 
 const dir = {
@@ -42,8 +42,12 @@ const ctx = canvas.getContext("2d");
 
 const priorities = argumentsOption.layers;
 
-const main = async (numberOfOutputs=10) => {
+const main = async (numberOfOutputs=30) => {
     const traitTypesDir = dir.traitTypes;
+
+    console.log(dir)
+    console.log(priorities)
+
     // register all the traits
     const types = fs.readdirSync(traitTypesDir);
 
@@ -56,13 +60,17 @@ const main = async (numberOfOutputs=10) => {
                 .map((value) => {
                     return { trait_type: traitType, value: value };
                 })
-                .concat({ trait_type: traitType, value: "N/A" })
+                // .concat({ trait_type: traitType, value: "N/A" })
         );
 
     const backgrounds = fs.readdirSync(dir.background);
 
     // trait type avail for each punk
     const combinations = allPossibleCases(traitTypes, numberOfOutputs);
+
+    console.log(combinations)
+
+    // return
 
     for (var n = 0; n < combinations.length; n++) {
         const randomBackground =
@@ -110,8 +118,6 @@ const allPossibleCases = (arraysToCombine, max) => {
     }
 
     return combinations;
-
-    return [];
 };
 
 const drawImage = async (traitTypes, background, index) => {
