@@ -68,9 +68,8 @@ const main = async (numberOfOutputs=30) => {
     // trait type avail for each punk
     const combinations = allPossibleCases(traitTypes, numberOfOutputs);
 
-    console.log(combinations)
-
-    // return
+    console.log(randomTraits(traitTypes, numberOfOutputs))
+    return
 
     for (var n = 0; n < combinations.length; n++) {
         const randomBackground =
@@ -87,6 +86,23 @@ const recreateOutputsDir = () => {
     fs.mkdirSync(`${dir.outputs}/metadata`);
     fs.mkdirSync(`${dir.outputs}/images`);
 };
+
+const randomTraits = (arraysToCombine, max) => {
+    console.log(arraysToCombine)
+    
+    // const results = []
+    // const trait_types = []
+
+    // arraysToCombine.map(item => {
+    //     trait_types.push(item[0]['trait_type'])
+    // })
+
+    // for(let i = 0; i < max; i++) {
+    //     const item = {
+            
+    //     }   
+    // }
+}
 
 const allPossibleCases = (arraysToCombine, max) => {
     const divisors = [];
