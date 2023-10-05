@@ -5,11 +5,15 @@ const commandLineArgs = require('command-line-args');
 
 const fs = require("fs");
 const { createCanvas, loadImage } = require("canvas");
+const cliProgress = require("cli-progress")
+const ConsoleStyle = require("./config")
 
 const optionDefinitions = [
     { name: 'background', alias: 'b', type: String },
     { name: 'traits', type: String, multiple: true, alias: 't' },
-    { name: 'layers', type: String, multiple: true, alias: 'l' }
+    { name: 'layers', type: String, multiple: true, alias: 'l' },
+    { name: 'name', type: String, alias: 'n'},
+    { name: 'count', type: Number, alias: 'c'}
 ]
 
 const argumentsOption = commandLineArgs(optionDefinitions)
@@ -25,31 +29,13 @@ const dir = {
     background: `./${argumentsOption.background}`,
 };
 
-let totalOutputs = 0;
-
 const canvas = createCanvas(imageFormat.width, imageFormat.height);
 const ctx = canvas.getContext("2d");
 
-// const priorities = [
-//     "tails",
-//     "wings",
-//     "skin",
-//     "hat",
-//     "eyes",
-//     "mouth",
-//     "clothes",
-// ];
-
 const priorities = argumentsOption.layers;
 
-const main = async (numberOfOutputs=100) => {
+const main = async (numberOfOutputs=argumentsOption.count) => {
     const traitTypesDir = dir.traitTypes;
-
-    console.log(dir)
-    console.log(priorities)
-
-    // register all the traits
-    const types = fs.readdirSync(traitTypesDir);
 
     // set all priotized layers to be drawn first. for eg: punk type, top... You can set these values in the priorities array in line 21
     const traitTypes = priorities
@@ -68,15 +54,20 @@ const main = async (numberOfOutputs=100) => {
     // trait type avail for each punk
     const combinations = randomTraits(traitTypes, numberOfOutputs);
 
-    // console.log(combinations)
-    // console.log(randomTraits(traitTypes, numberOfOutputs))
-    // return
+    const progressBar = new cliProgress.SingleBar({ barsize: 60, format: `Progress: {bar} {percentage}/${numberOfOutputs} Generated | Remained: {eta}s` }, cliProgress.Presets.shades_classic)
+    progressBar.start(numberOfOutputs, 0)
 
     for (var n = 0; n < combinations.length; n++) {
         const randomBackground =
             backgrounds[Math.floor(Math.random() * backgrounds.length)];
         await drawImage(combinations[n], randomBackground, n);
+
+        progressBar.update(n + 1)
     }
+
+    progressBar.stop()
+
+    console.log("\n", ConsoleStyle.FgCyan, "NFT Collection was successfully created. Happy minting!", ConsoleStyle.Reset)
 };
 
 const recreateOutputsDir = () => {
@@ -89,8 +80,6 @@ const recreateOutputsDir = () => {
 };
 
 const randomTraits = (arraysToCombine, max) => {
-    console.log(arraysToCombine)
-    
     const results = []
 
     for(let i = 0; i < max; i++) {
@@ -120,8 +109,6 @@ const allPossibleCases = (arraysToCombine, max) => {
         console.log(max);
         permsCount = max;
     }
-
-    totalOutputs = permsCount;
 
     const getCombination = (n, arrays, divisors) =>
         arrays.reduce((acc, arr, i) => {
@@ -153,13 +140,11 @@ const drawImage = async (traitTypes, background, index) => {
         ctx.drawImage(image, 0, 0, imageFormat.width, imageFormat.height);
     }
 
-    console.log(`Progress: ${index + 1}/ ${totalOutputs}`);
-
     // save metadata
     fs.writeFileSync(
         `${dir.outputs}/metadata/${index + 1}.json`,
         JSON.stringify({
-            name: `punk ${index}`,
+            name: `${argumentsOption.name}#${index}`,
             attributes: drawableTraits,
         }),
         function (err) {
@@ -174,8 +159,42 @@ const drawImage = async (traitTypes, background, index) => {
     );
 };
 
+const consolePrint = () => {
+    console.log(ConsoleStyle.FgCyan, "\n", "Directories", ConsoleStyle.Reset)
+    console.table([{ 'Trait': dir.traitTypes, 'Output': dir.outputs, 'Background': dir.background }])
+    console.log("\n")
+    console.log(ConsoleStyle.FgCyan, "Trait Layer Priorities", ConsoleStyle.Reset)
+    console.table(priorities.map(layer => ({ 'Layers': layer })))
+    console.log("\n")
+}
+
+const validateParams = () => {
+    if(!argumentsOption.background) {
+        console.log(ConsoleStyle.FgRed, "\nBackground directory must be inputted. e.g: -background | -b traits/bg", ConsoleStyle.Reset)
+        process.exit(1)
+    }
+    if(!argumentsOption.traits) {
+        console.log(ConsoleStyle.FgRed, "\nTraits directory must be inputted. e.g: -trait | -t traits", ConsoleStyle.Reset)
+        process.exit(1)
+    }
+    if(!argumentsOption.traits) {
+        console.log(ConsoleStyle.FgRed, "\nLayer priority must be inputted. e.g: -layers | -l head body leg foot", ConsoleStyle.Reset)
+        process.exit(1)
+    }
+    if(!argumentsOption.name) {
+        console.log(ConsoleStyle.FgRed, "\nCollection name must be inputted. e.g: -name | -n MyCollection", ConsoleStyle.Reset)
+        process.exit(1)
+    }
+    if(!argumentsOption.count) {
+        console.log(ConsoleStyle.FgRed, "\nValid collection amount must be inputted. e.g: -count | -c 1000", ConsoleStyle.Reset)
+        process.exit(1)
+    }
+}
+
 //main
 (() => {
+    validateParams()
+    consolePrint()
     recreateOutputsDir();
     main();
 })();
