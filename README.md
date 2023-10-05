@@ -4,7 +4,7 @@ This tool generates generative NFT collection, based of all available traits.
 It was made with the intention to make the generative art field more accessible to anyone.  
 With this tool you don't need to be a programmer to create generative art.
 
-<img src="https://github.com/formysister/nft-generator/blob/main/screenshot/screenshot.png?raw=true" width="400" />
+<img src="https://github.com/formysister/nft-generator/blob/main/screenshot/screenshot.png?raw=true" width="100%" />
 
 **Features:**
 * Generate Images of an infinite amount of traits
