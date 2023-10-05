@@ -42,7 +42,7 @@ const ctx = canvas.getContext("2d");
 
 const priorities = argumentsOption.layers;
 
-const main = async (numberOfOutputs=30) => {
+const main = async (numberOfOutputs=100) => {
     const traitTypesDir = dir.traitTypes;
 
     console.log(dir)
@@ -66,10 +66,11 @@ const main = async (numberOfOutputs=30) => {
     const backgrounds = fs.readdirSync(dir.background);
 
     // trait type avail for each punk
-    const combinations = allPossibleCases(traitTypes, numberOfOutputs);
+    const combinations = randomTraits(traitTypes, numberOfOutputs);
 
-    console.log(randomTraits(traitTypes, numberOfOutputs))
-    return
+    // console.log(combinations)
+    // console.log(randomTraits(traitTypes, numberOfOutputs))
+    // return
 
     for (var n = 0; n < combinations.length; n++) {
         const randomBackground =
@@ -90,18 +91,18 @@ const recreateOutputsDir = () => {
 const randomTraits = (arraysToCombine, max) => {
     console.log(arraysToCombine)
     
-    // const results = []
-    // const trait_types = []
+    const results = []
 
-    // arraysToCombine.map(item => {
-    //     trait_types.push(item[0]['trait_type'])
-    // })
+    for(let i = 0; i < max; i++) {
+        const item = []
+        priorities.map((trait, index) => {
+            item.push({ trait_type: trait, value: arraysToCombine[index][Math.floor(Math.random() * arraysToCombine[index].length)].value })
+        })
 
-    // for(let i = 0; i < max; i++) {
-    //     const item = {
-            
-    //     }   
-    // }
+        results.push(item)
+    }
+
+    return results
 }
 
 const allPossibleCases = (arraysToCombine, max) => {
